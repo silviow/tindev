@@ -17,7 +17,8 @@ io.on('connection', socket => {
 });
 
 mongoose.connect('mongodb://localhost:27017/tindev', {
-  useNewUrlParser: true
+  useNewUrlParser: true,
+  useUnifiedTopology: true
 });
 
 app.use((req, res, next) => {
