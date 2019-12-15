@@ -55,11 +55,11 @@ export default function Main({ match }) {
                                     <p>{user.bio ? user.bio : "No description provided."}</p>
                                 </footer>
                                 <div className="buttons">
-                                    <button type="button" onClick={() => handleLike(user._id)}>
-                                        <img src={like} alt="Like" />
-                                    </button>
                                     <button type="button" onClick={() => handleDislike(user._id)}>
                                         <img src={dislike} alt="Dislike" />
+                                    </button>
+                                    <button type="button" onClick={() => handleLike(user._id)}>
+                                        <img src={like} alt="Like" />
                                     </button>
                                 </div>
                             </li>
