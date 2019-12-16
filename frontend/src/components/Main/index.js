@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import io from 'socket.io-client';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import logo from '../../assets/logo.svg';
 import like from '../../assets/like.svg';
 import dislike from '../../assets/dislike.svg';
+import itsamatch from '../../assets/itsamatch.png'
 import './style.css';
 
 export default function Main({ match }) {
     const [ users, setUsers ] = useState([]);
+    const [ matchDev, setMatchDev ] = useState(null);
 
     useEffect(() => {
 
@@ -21,6 +24,18 @@ export default function Main({ match }) {
             setUsers(response.data);
         })();
 
+    }, [match.params.id]);
+
+    useEffect(() => {
+        const socket = io("http://localhost:3333", {
+            query: {
+                user: match.params.id
+            }
+        });
+
+        socket.on("match", dev => {
+            setMatchDev(dev);
+        })
     }, [match.params.id]);
 
     async function handleLike(id) {
@@ -70,6 +85,16 @@ export default function Main({ match }) {
             ) : (
                 <div className="empty">
                     <h4>At the moment there are no more registered devs :/</h4>
+                </div>
+            ) }
+
+            { matchDev && (
+                <div className="match-container">
+                    <img src={itsamatch} alt="It's a match!" />
+                    <img className="avatar" src={matchDev.avatar} alt={matchDev.name + "'s avatar"} />
+                    <strong>{matchDev.name}</strong>
+                    <p>{matchDev.bio ? matchDev.bio : "No description provided."}</p>
+                    <button type="button" onClick={() => setMatchDev(null)}>CLOSE</button>
                 </div>
             ) }
         </div>
