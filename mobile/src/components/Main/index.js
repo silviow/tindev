@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import api from '../../services/api';
+import io from 'socket.io-client';
 import logo from '../../assets/logo.png';
 import like from '../../assets/like.png';
 import dislike from '../../assets/dislike.png';
+import itsamatch from '../../assets/itsamatch.png';
 import { 
     StyleSheet,
     SafeAreaView,
@@ -16,8 +18,10 @@ import {
 export default function Main({ navigation }) {
     const id = navigation.getParam("user");
     const [ users, setUsers ] = useState([]);
+    const [ matchDev, setMatchDev ] = useState(null);
 
     useEffect(() => {
+        let didCancel = false;
 
         (async function loadUsers() {
             const response = await api.get("/devs", {
@@ -26,9 +30,26 @@ export default function Main({ navigation }) {
                 }
             });
 
-            setUsers(response.data);
+            if (!didCancel) setUsers(response.data);
         })();
 
+        return () => didCancel = true;
+    }, [id]);
+
+    useEffect(() => {
+        let didCancel = false;
+
+        const socket = io("http://localhost:3333", {
+            query: {
+                user: id
+            }
+        });
+
+        socket.on("match", dev => {
+            if (!didCancel) setMatchDev(dev);
+        })
+
+        return () => didCancel = true;
     }, [id]);
 
     async function handleLike() {
@@ -89,6 +110,18 @@ export default function Main({ navigation }) {
                     </TouchableOpacity>
                 </View>
             ) : ( <View /> ) }
+
+            { matchDev && (
+                <View style={styles.matchContainer}>
+                    <Image style={styles.itsMatchImg} source={itsamatch} />
+                    <Image style={styles.matchAvatar} source={{ uri: matchDev.avatar }} />
+                    <Text style={styles.matchName}>{matchDev.name}</Text>
+                    <Text style={styles.matchBio}>{matchDev.bio ? matchDev.bio : "No description provided."}</Text>
+                    <TouchableOpacity onPress={() => setMatchDev(null)}>
+                        <Text style={styles.matchClose}>CLOSE</Text>
+                    </TouchableOpacity>
+                </View>
+            ) }
         </SafeAreaView>
     );
 }
@@ -96,27 +129,24 @@ export default function Main({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        zIndex: 1,
         alignItems: "center",
         backgroundColor: "#f5f5f5",
         justifyContent: "space-between",
     },
     cardsContainer: {
         flex: 1,
+        maxHeight: 500,
         alignSelf: "stretch",
         justifyContent: "center",
-        maxHeight: 500,
     },
     card: {
-        borderWidth: 1,
-        borderColor: "#ddd",
-        borderRadius: 20,
         margin: 30,
+        borderWidth: 1,
+        borderRadius: 20,
         overflow: "hidden",
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
+        borderColor: "#ddd",
+        ...StyleSheet.absoluteFillObject,
     },
     avatar: {
         flex: 1,
@@ -129,8 +159,8 @@ const styles = StyleSheet.create({
     },
     name: {
         fontSize: 16,
-        fontWeight: "bold",
         color: "#333",
+        fontWeight: "bold",
     },
     bio: {
         fontSize: 14,
@@ -142,32 +172,72 @@ const styles = StyleSheet.create({
         marginTop: 30,
     },
     buttonsContainer: {
-        flexDirection: "row",
+        zIndex: 1,
         marginBottom: 30,
+        flexDirection: "row",
     },
     button: {
         width: 60,
         height: 60,
-        borderRadius: 30,
-        backgroundColor: "#fff",
-        justifyContent: "center",
-        alignItems: "center",
-        marginHorizontal: 15,
         elevation: 1.5,
-        shadowColor: "#000",
-        shadowOpacity: 0.05,
-        shadowRadius: 1,
         shadowOffset: {
             width: 0,
             height: 2,
-        }
+        },
+        shadowRadius: 1,
+        borderRadius: 30,
+        shadowColor: "#000",
+        shadowOpacity: 0.05,
+        alignItems: "center",
+        marginHorizontal: 15,
+        backgroundColor: "#fff",
+        justifyContent: "center",
     },
     empty: {
-        alignSelf: "center",
-        color: "#999",
         fontSize: 16,
-        textAlign: "center",
-        paddingHorizontal: 20,
+        color: "#999",
         fontWeight: "bold",
+        textAlign: "center",
+        alignSelf: "center",
+        paddingHorizontal: 20,
+    },
+    matchContainer: {
+        zIndex: 2,
+        alignItems: "center",
+        justifyContent: "center",
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: "rgba(0,0,0,0.8)",
+    },
+    itsMatchImg: {
+        height: 60,
+        resizeMode: "contain",
+    },
+    matchAvatar: {
+        width: 160,
+        height: 160,
+        borderWidth: 5,
+        borderRadius: 80,
+        marginVertical: 30,
+        borderColor: "#fff",
+    },
+    matchName: {
+        fontSize: 22,
+        color: "#fff",
+        fontWeight: "bold",
+    },
+    matchBio: {
+        fontSize: 16,
+        marginTop: 10,
+        lineHeight: 20,
+        textAlign: "center",
+        paddingHorizontal: 30,
+        color: "rgba(255,255,255,0.85)",
+    },
+    matchClose: {
+        fontSize: 18,
+        marginTop: 25,
+        fontWeight: "bold",
+        textAlign: "center",
+        color: "rgba(255,255,255,0.85)",
     }
 });
