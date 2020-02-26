@@ -1,7 +1,7 @@
 # Tindev
 :heart: A tinder for devs. 
 
-Cross-platform application developed for study purposes with NodeJS, ReactJS and React Native during [@Rocketseat](https://github.com/rocketseat)'s "Semana Omnistack 8" event.
+Cross-platform application developed for study purposes with Node.js, React and React Native during [@Rocketseat](https://github.com/rocketseat)'s "Semana Omnistack 8" event.
 
 Technologies and tools used in this project:
 
