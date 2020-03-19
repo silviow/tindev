@@ -8,7 +8,6 @@ Technologies and tools used on this project:
 - HTML
 - CSS
 - JavaScript
-- JSX
 - Node.js
 - Express
 - MongoDB
@@ -17,7 +16,6 @@ Technologies and tools used on this project:
 - Axios
 - React.js
 - React Native
-- React Navigation
 
 ![Login screen](login-screen.jpg)
 
