@@ -5,15 +5,11 @@ Cross-platform application developed for study purposes with Node.js, React.js a
 
 Technologies and tools used on this project:
 
-- HTML
-- CSS
-- JavaScript
 - Node.js
 - Express
 - MongoDB
 - Mongoose
 - Socket.io
-- Axios
 - React.js
 - React Native
 
