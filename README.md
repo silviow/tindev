@@ -13,6 +13,4 @@ Technologies and tools used on this project:
 - React.js
 - React Native
 
-![Login screen](login-screen.jpg)
-
-![Main screen](main-screen.jpg)
+![Home and login screen demo](demo.jpg)
